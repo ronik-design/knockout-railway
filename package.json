@@ -1,0 +1,48 @@
+{
+  "name": "knockout-railway",
+  "version": "0.1.0",
+  "description": "Knockout binding allowing a child to follow/scroll within a parent el.",
+  "main": "dist/knockout-railway.js",
+  "jsnext:main": "lib/index.js",
+  "scripts": {
+    "build": "mkdir -p dist && babel-node rollup.js",
+    "test": "eslint lib",
+    "prepublish": "npm test && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ronik-design/knockout-railway.git"
+  },
+  "keywords": [
+    "knockout",
+    "binding",
+    "viewport",
+    "railway",
+    "scrolling",
+    "waypoints"
+  ],
+  "author": {
+    "name": "Michael Shick (Ronik Design)",
+    "email": "contact@ronikdesign.com",
+    "url": "http://www.ronikdesign.com"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ronik-design/knockout-railway/issues"
+  },
+  "homepage": "https://github.com/ronik-design/knockout-railway#readme",
+  "devDependencies": {
+    "babel": "^5.8.29",
+    "eslint": "^1.7.3",
+    "eslint-config-defaults": "^7.0.1",
+    "eslint-plugin-filenames": "^0.1.2",
+    "object-assign": "^4.0.1",
+    "rollup": "^0.20.2",
+    "rollup-plugin-babel": "^1.0.0",
+    "rollup-plugin-inject": "^1.1.1",
+    "rollup-plugin-npm": "^1.0.0"
+  },
+  "dependencies": {
+    "vanillajs-dom": "^0.1.0"
+  }
+}
