@@ -1,126 +1,6 @@
 'use strict';
 
-var exports$1 = {};
-var module$1 = { 'exports': exports$1 };
-var hasOwnProperty = Object.prototype.hasOwnProperty;
-var propIsEnumerable = Object.prototype.propertyIsEnumerable;
-
-function toObject(val) {
-	if (val === null || val === undefined) {
-		throw new TypeError('Object.assign cannot be called with null or undefined');
-	}
-
-	return Object(val);
-}
-
-module$1.exports = Object.assign || function (target, source) {
-	var from;
-	var to = toObject(target);
-	var symbols;
-
-	for (var s = 1; s < arguments.length; s++) {
-		from = Object(arguments[s]);
-
-		for (var key in from) {
-			if (hasOwnProperty.call(from, key)) {
-				to[key] = from[key];
-			}
-		}
-
-		if (Object.getOwnPropertySymbols) {
-			symbols = Object.getOwnPropertySymbols(from);
-			for (var i = 0; i < symbols.length; i++) {
-				if (propIsEnumerable.call(from, symbols[i])) {
-					to[symbols[i]] = from[symbols[i]];
-				}
-			}
-		}
-	}
-
-	return to;
-};
-var $inject_Object_assign = module$1.exports;
-
-var outerHeight = function outerHeight(el) {
-
-  var style = getComputedStyle(el);
-
-  var height = el.offsetHeight;
-  height += parseInt(style.marginTop) + parseInt(style.marginBottom);
-
-  return height;
-};
-
-var acceptNode = function acceptNode(selector) {
-
-  var firstChar = selector ? selector.charAt(0) : "";
-
-  return function (node) {
-    if (selector) {
-
-      // If selector is a class
-      if (firstChar === ".") {
-        if (node.classList.contains(selector.substr(1))) {
-          return NodeFilter.FILTER_ACCEPT;
-        }
-      }
-
-      // If selector is an ID
-      if (firstChar === "#") {
-        if (node.id === selector.substr(1)) {
-          return NodeFilter.FILTER_ACCEPT;
-        }
-      }
-
-      // If selector is a data attribute
-      if (firstChar === "[") {
-        if (node.hasAttribute(selector.substr(1, selector.length - 2))) {
-          return NodeFilter.FILTER_ACCEPT;
-        }
-
-        // If selector is a tag
-        if (node.tagName.toLowerCase() === selector) {
-          return NodeFilter.FILTER_ACCEPT;
-        }
-      }
-    } else {
-
-      return NodeFilter.FILTER_ACCEPT;
-    }
-  };
-};
-
-var walkTree = function walkTree(element, selector, direction) {
-  var limit = arguments.length <= 3 || arguments[3] === undefined ? -1 : arguments[3];
-
-  var treeWalker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT, acceptNode(selector), false);
-
-  treeWalker.currentNode = element;
-
-  var nodes = [];
-
-  if (direction === "up") {
-    while (treeWalker.parentNode() && (nodes.length < limit || limit === -1)) {
-      nodes.push(treeWalker.currentNode);
-    }
-  } else {
-    while (treeWalker.childNode() && (nodes.length < limit || limit === -1)) {
-      nodes.push(treeWalker.currentNode);
-    }
-  }
-
-  return nodes;
-};
-
-var getParent = function getParent(element, selector) {
-
-  var nodes = walkTree(element, selector, "up", 1);
-  return nodes[0];
-};
-
-var scrollTop = function scrollTop() {
-  return window.scrollY || window.pageYOffset;
-};
+var vanillajsDom = require('vanillajs-dom');
 
 var waypoints = [];
 var positions = [];
@@ -175,7 +55,7 @@ var goingDown = function goingDown(pos, range) {
 
 var getDirection = function getDirection() {
 
-  var y = scrollTop();
+  var y = vanillajsDom.scrollTop();
 
   var direction = undefined;
 
@@ -195,8 +75,8 @@ var fireInRangeCallbacks = function fireInRangeCallbacks() {
   var direction = getDirection();
 
   var range = {
-    top: Math.max(scrollTop() + winOffset, 0),
-    bottom: Math.max(scrollTop(), 0) + winHeight
+    top: Math.max(vanillajsDom.scrollTop() + winOffset, 0),
+    bottom: Math.max(vanillajsDom.scrollTop(), 0) + winHeight
   };
 
   var evalRange = function evalRange(pos) {
@@ -232,9 +112,9 @@ var calcPositions = function calcPositions() {
     var parentOffset = wp.parentOffset();
     var parentTop = parentOffset.top;
     var parentBottom = parentOffset.bottom;
-    var stopBottom = parentOffset.bottom - outerHeight(wp.element);
+    var stopBottom = parentOffset.bottom - vanillajsDom.outerHeight(wp.element);
 
-    return $inject_Object_assign(wp, { parentTop: parentTop, parentBottom: parentBottom, stopBottom: stopBottom });
+    return Object.assign(wp, { parentTop: parentTop, parentBottom: parentBottom, stopBottom: stopBottom });
   });
 
   winHeight = window.innerHeight;
@@ -242,7 +122,7 @@ var calcPositions = function calcPositions() {
 
 var getParentOffset = function getParentOffset(element, padding) {
 
-  var parentEl = getParent(element, "[data-railway]");
+  var parentEl = vanillajsDom.parent(element, "[data-railway]");
 
   var paddingTop = padding.top || 0;
   var paddingTopPercentage = false;
@@ -272,10 +152,10 @@ var getParentOffset = function getParentOffset(element, padding) {
       rect = parentEl.getBoundingClientRect();
     }
 
-    var height = outerHeight(parentEl);
+    var height = vanillajsDom.outerHeight(parentEl);
 
-    var top = rect.top + scrollTop();
-    var bottom = rect.bottom + scrollTop();
+    var top = rect.top + vanillajsDom.scrollTop();
+    var bottom = rect.bottom + vanillajsDom.scrollTop();
 
     if (paddingTopPercentage) {
       top += Math.floor(height * paddingTop);
