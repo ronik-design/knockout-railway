@@ -1,18 +1,45 @@
 'use strict';
 
-var $inject_Object_assign = Object.assign || function (target) {
-  for (var _len = arguments.length, sources = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-    sources[_key - 1] = arguments[_key];
-  }
+var exports$1 = {};
+var module$1 = { 'exports': exports$1 };
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+var propIsEnumerable = Object.prototype.propertyIsEnumerable;
 
-  sources.forEach(function (source) {
-    Object.keys(source).forEach(function (key) {
-      return target[key] = source[key];
-    });
-  });
+function toObject(val) {
+	if (val === null || val === undefined) {
+		throw new TypeError('Object.assign cannot be called with null or undefined');
+	}
 
-  return target;
+	return Object(val);
+}
+
+module$1.exports = Object.assign || function (target, source) {
+	var from;
+	var to = toObject(target);
+	var symbols;
+
+	for (var s = 1; s < arguments.length; s++) {
+		from = Object(arguments[s]);
+
+		for (var key in from) {
+			if (hasOwnProperty.call(from, key)) {
+				to[key] = from[key];
+			}
+		}
+
+		if (Object.getOwnPropertySymbols) {
+			symbols = Object.getOwnPropertySymbols(from);
+			for (var i = 0; i < symbols.length; i++) {
+				if (propIsEnumerable.call(from, symbols[i])) {
+					to[symbols[i]] = from[symbols[i]];
+				}
+			}
+		}
+	}
+
+	return to;
 };
+var $inject_Object_assign = module$1.exports;
 
 var outerHeight = function outerHeight(el) {
 

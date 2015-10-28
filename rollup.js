@@ -4,6 +4,7 @@ import { rollup } from "rollup";
 import npm from "rollup-plugin-npm";
 import babel from "rollup-plugin-babel";
 import inject from "rollup-plugin-inject";
+import commonjs from "rollup-plugin-commonjs";
 
 
 const input = {
@@ -11,6 +12,7 @@ const input = {
   external: ["object-assign"],
   plugins: [
     npm({ jsnext: true, main: true }),
+    commonjs(),
     inject({ "Object.assign": "object-assign" }),
     babel()
   ]
