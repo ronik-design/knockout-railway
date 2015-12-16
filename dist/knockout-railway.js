@@ -6,6 +6,7 @@ var waypoints = [];
 var positions = [];
 var inViewport = [];
 
+var threshold = 0.15;
 var winHeight = 0;
 var winOffset = 0;
 var prevY = 0;
@@ -24,9 +25,26 @@ var removeFromViewport = function removeFromViewport(position, direction) {
   }
 };
 
+var isPercent = function isPercent(n) {
+  return n === Number(n) && n <= 1 && (n % 1 !== 0 || n === 1);
+};
+
 var isInViewport = function isInViewport(pos) {
 
   return inViewport.indexOf(pos) > -1;
+};
+
+var isTooSmall = function isTooSmall(parentEl, element) {
+
+  if (!threshold) {
+    return false;
+  }
+
+  var diff = parentEl.offsetHeight - element.offsetHeight;
+
+  if (diff < Math.floor(parentEl.offsetHeight * threshold)) {
+    return true;
+  }
 };
 
 var goingUp = function goingUp(pos, range) {
@@ -83,11 +101,11 @@ var fireInRangeCallbacks = function fireInRangeCallbacks() {
 
     if (isInViewport(pos)) {
 
-      if (direction === "down" && range.top >= pos.stopBottom) {
+      if (direction === "down" && range.top > pos.stopBottom) {
         removeFromViewport(pos, direction);
       }
 
-      if (direction === "up" && range.top <= pos.parentTop) {
+      if (direction === "up" && range.top < pos.parentTop) {
         removeFromViewport(pos, direction);
       }
     } else {
@@ -120,54 +138,44 @@ var calcPositions = function calcPositions() {
   winHeight = window.innerHeight;
 };
 
+var calcWithPadding = function calcWithPadding(val, height, padding) {
+
+  var padded = val + vanillajsDom.scrollTop();
+
+  if (padding && isPercent(padding)) {
+    padded -= Math.floor(height * padding);
+  } else {
+    padded -= padding;
+  }
+
+  return padded;
+};
+
 var getParentOffset = function getParentOffset(element, padding) {
 
   var parentEl = vanillajsDom.parent(element, "[data-railway]");
-
   var paddingTop = padding.top || 0;
-  var paddingTopPercentage = false;
-
   var paddingBottom = padding.bottom || 0;
-  var paddingBottomPercentage = false;
-
-  if (paddingTop && paddingTop.search && paddingTop.search("%") > -1) {
-    paddingTop = parseInt(paddingTop.replace("%", ""), 10) / 100;
-    paddingTopPercentage = true;
-  }
-
-  if (paddingBottom && paddingBottom.search && paddingBottom.search("%") > -1) {
-    paddingBottom = parseInt(paddingBottom.replace("%", ""), 10) / 100;
-    paddingBottomPercentage = true;
-  }
 
   return function () {
 
+    var rect = { top: 0 };
+
     if (!parentEl || !parentEl.ownerDocument) {
-      return null;
+      return rect;
     }
 
-    var rect = { top: 0 };
+    if (isTooSmall(parentEl, element)) {
+      return rect;
+    }
 
     if (parentEl.getBoundingClientRect) {
       rect = parentEl.getBoundingClientRect();
     }
 
     var height = vanillajsDom.outerHeight(parentEl);
-
-    var top = rect.top + vanillajsDom.scrollTop();
-    var bottom = rect.bottom + vanillajsDom.scrollTop();
-
-    if (paddingTopPercentage) {
-      top += Math.floor(height * paddingTop);
-    } else {
-      top += paddingTop;
-    }
-
-    if (paddingBottomPercentage) {
-      bottom += Math.floor(height * paddingBottom);
-    } else {
-      bottom += paddingBottom;
-    }
+    var top = calcWithPadding(rect.top, height, paddingTop);
+    var bottom = calcWithPadding(rect.bottom, height, paddingBottom);
 
     return { top: top, bottom: bottom };
   };
@@ -229,7 +237,8 @@ var binding = function binding(ko) {
   var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
   ko = ko || window.ko;
-  winOffset = options.winOffset || 0;
+  winOffset = options.winOffset || winHeight;
+  threshold = options.threshold || threshold;
 
   var createWaypoint = function createWaypoint(element, valueAccessor) {
 
