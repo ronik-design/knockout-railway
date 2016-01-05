@@ -1,6 +1,6 @@
 {
   "name": "knockout-railway",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Knockout binding allowing a child to follow/scroll within a parent el.",
   "main": "dist/knockout-railway.js",
   "jsnext:main": "lib/knockout-railway.js",

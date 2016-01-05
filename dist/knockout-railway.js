@@ -137,11 +137,15 @@ var calcPositions = function calcPositions() {
   positions = waypoints.map(function (wp) {
 
     var parentOffset = wp.parentOffset();
-    var parentTop = parentOffset.top;
-    var parentBottom = parentOffset.bottom;
-    var stopBottom = parentOffset.bottom - vanillajsDom.outerHeight(wp.element);
 
-    return Object.assign(wp, { parentTop: parentTop, parentBottom: parentBottom, stopBottom: stopBottom });
+    var parentPos = {
+      parentTop: parentOffset.top,
+      parentBottom: parentOffset.bottom,
+      stopBottom: parentOffset.bottom - vanillajsDom.outerHeight(wp.element),
+      isTooSmall: parentOffset.isTooSmall
+    };
+
+    return Object.assign(wp, parentPos);
   });
 
   winHeight = window.innerHeight;
