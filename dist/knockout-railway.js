@@ -99,6 +99,15 @@ var fireInRangeCallbacks = function fireInRangeCallbacks() {
 
   var evalRange = function evalRange(pos) {
 
+    if (pos.isTooSmall) {
+
+      if (isInViewport(pos)) {
+        removeFromViewport(pos, "tooSmall");
+      }
+
+      return;
+    }
+
     if (isInViewport(pos)) {
 
       if (direction === "down" && range.top > pos.stopBottom) {
@@ -165,10 +174,6 @@ var getParentOffset = function getParentOffset(element, padding) {
       return rect;
     }
 
-    if (isTooSmall(parentEl, element)) {
-      return rect;
-    }
-
     if (parentEl.getBoundingClientRect) {
       rect = parentEl.getBoundingClientRect();
     }
@@ -177,7 +182,7 @@ var getParentOffset = function getParentOffset(element, padding) {
     var top = calcWithPadding(rect.top, height, paddingTop);
     var bottom = calcWithPadding(rect.bottom, height, paddingBottom);
 
-    return { top: top, bottom: bottom };
+    return { top: top, bottom: bottom, isTooSmall: isTooSmall(parentEl, element) };
   };
 };
 
